@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lumity</title>
+<meta name="description" content="Lumity: peças 3D.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --nevoa: #edf0f7;
+    --papel: #ffffff;
+    --tinta: #17163a;
+    --tinta-suave: #54567a;
+    --linha: #d5d9e8;
+    --violeta: #5b4bdb;
+    --lume: #ffd866;
+    --rail: 168px;
+    --fonte-ui: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --fonte-texto: "Newsreader", Georgia, "Times New Roman", serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-tema="claro"]) {
+      --nevoa: #13122b;
+      --papel: #1d1c3d;
+      --tinta: #f1f0fb;
+      --tinta-suave: #a9aacb;
+      --linha: #34335c;
+      --violeta: #9d93ff;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { height: 100%; }
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--nevoa);
+    color: var(--tinta);
+    font-family: var(--fonte-ui);
+    font-size: 17px;
+    line-height: 1.55;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--rail);
+    min-height: 100vh;
+  }
+
+  /* Área central */
+  main {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(28px, 5vw, 64px);
+    --x: 30%;
+    --y: 0%;
+  }
+  main::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(520px circle at var(--x) var(--y), color-mix(in srgb, var(--lume) 55%, transparent), transparent 70%);
+    opacity: .6;
+  }
+  .conteudo { position: relative; max-width: 760px; }
+
+  .marca {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 2px;
+    margin: 0 0 6px;
+    font-size: clamp(2.6rem, 7vw, 4.6rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .marca i {
+    display: inline-block;
+    width: .2em;
+    height: .2em;
+    border-radius: 50%;
+    background: var(--lume);
+    box-shadow: 0 0 0 .06em var(--tinta), 0 0 .5em .12em var(--lume);
+    margin-left: .06em;
+  }
+  .lema { margin: 0 0 clamp(28px, 5vw, 48px); color: var(--tinta-suave); font-size: 1.1rem; }
+
+  h2 { margin: 0 0 12px; font-size: 1.6rem; letter-spacing: -0.02em; line-height: 1.2; }
+  .painel[hidden] { display: none; }
+
+  .texto { font-family: var(--fonte-texto); font-size: 1.2rem; line-height: 1.65; max-width: 62ch; }
+  .texto p { margin: 0 0 1em; }
+
+  .vazio {
+    padding: 22px 24px;
+    background: var(--papel);
+    border: 1px dashed var(--linha);
+    border-radius: 10px;
+    max-width: 52ch;
+  }
+  .vazio p { margin: 0 0 14px; }
+  .vazio p:last-child { margin-bottom: 0; }
+
+  /* Botões */
+  .acoes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  .botao {
+    display: inline-block;
+    padding: 11px 18px;
+    border-radius: 8px;
+    border: 1.5px solid var(--tinta);
+    color: var(--tinta);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: .95rem;
+    transition: background-color .15s, color .15s;
+  }
+  .botao:hover { background: var(--tinta); color: var(--nevoa); }
+  .botao.principal { background: var(--violeta); border-color: var(--violeta); color: #fff; }
+  .botao.principal:hover { background: var(--tinta); border-color: var(--tinta); }
+  :root:not([data-tema="claro"]) .botao.principal { color: #13122b; }
+  @media (prefers-color-scheme: light) { .botao.principal { color: #fff; } }
+
+  /* Produtos */
+  .grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 18px; }
+  .produto {
+    background: var(--papel);
+    border: 1px solid var(--linha);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .produto .foto { aspect-ratio: 1; background: var(--linha); object-fit: cover; width: 100%; display: block; }
+  .produto .info { padding: 14px 16px 18px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .produto h3 { margin: 0; font-size: 1.05rem; }
+  .produto .preco { font-weight: 800; }
+  .produto .desc { color: var(--tinta-suave); font-size: .95rem; margin: 0 0 10px; }
+  .produto .botao { margin-top: auto; text-align: center; }
+
+  /* Avaliações */
+  .lista { display: grid; gap: 14px; max-width: 62ch; }
+  .avaliacao { background: var(--papel); border: 1px solid var(--linha); border-radius: 12px; padding: 16px 18px; }
+  .avaliacao .nota { color: var(--violeta); letter-spacing: 2px; }
+  .avaliacao blockquote { margin: 6px 0 8px; font-family: var(--fonte-texto); font-size: 1.1rem; }
+  .avaliacao .autor { font-weight: 600; font-size: .95rem; color: var(--tinta-suave); }
+
+  /* Barra lateral direita */
+  .rail {
+    display: grid;
+    grid-template-rows: repeat(3, 1fr);
+    border-left: 1px solid var(--linha);
+    background: var(--papel);
+  }
+  .rail a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 14px;
+    text-align: center;
+    color: var(--tinta-suave);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.02rem;
+    border-bottom: 1px solid var(--linha);
+    border-left: 5px solid transparent;
+    transition: background-color .2s, color .2s, border-color .2s;
+  }
+  .rail a:last-child { border-bottom: 0; }
+  .rail a:hover { background: color-mix(in srgb, var(--lume) 22%, transparent); color: var(--tinta); }
+  .rail a[aria-current="page"] {
+    color: var(--tinta);
+    border-left-color: var(--lume);
+    background: color-mix(in srgb, var(--lume) 38%, transparent);
+    box-shadow: inset 0 0 28px color-mix(in srgb, var(--lume) 50%, transparent);
+  }
+
+  a:focus-visible { outline: 3px solid var(--violeta); outline-offset: -3px; border-radius: 4px; }
+  .botao:focus-visible { outline-offset: 3px; }
+
+  /* Celular: a barra vai para baixo, em três partes */
+  @media (max-width: 720px) {
+    .layout { grid-template-columns: 1fr; }
+    main { padding-bottom: 110px; }
+    .rail {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      grid-template-rows: none;
+      grid-template-columns: repeat(3, 1fr);
+      border-left: 0;
+      border-top: 1px solid var(--linha);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      z-index: 5;
+    }
+    .rail a {
+      border-bottom: 0;
+      border-left: 0;
+      border-right: 1px solid var(--linha);
+      border-top: 4px solid transparent;
+      padding: 16px 6px;
+      font-size: .92rem;
+    }
+    .rail a:last-child { border-right: 0; }
+    .rail a[aria-current="page"] { border-left-color: transparent; border-top-color: var(--lume); }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <main id="central">
+    <div class="conteudo">
+      <h1 class="marca" aria-label="Lumity">Lumity<i aria-hidden="true"></i></h1>
+      <p class="lema" id="lema"></p>
+
+      <section class="painel" id="produtos" hidden>
+        <h2>Produtos</h2>
+        <div id="produtos-conteudo"></div>
+      </section>
+
+      <section class="painel" id="sobre" hidden>
+        <h2>Sobre a loja</h2>
+        <div id="sobre-conteudo"></div>
+      </section>
+
+      <section class="painel" id="avaliacoes" hidden>
+        <h2>Avaliações</h2>
+        <div id="avaliacoes-conteudo"></div>
+      </section>
+    </div>
+  </main>
+
+  <nav class="rail" aria-label="Seções da loja">
+    <a href="#produtos" data-painel="produtos">Produtos</a>
+    <a href="#sobre" data-painel="sobre">Sobre a loja</a>
+    <a href="#avaliacoes" data-painel="avaliacoes">Avaliações</a>
+  </nav>
+
+</div>
+
+<script>
+/* ==========================================================
+   EDITE AQUI: tudo o que aparece no site fica neste bloco.
+   Salve o arquivo no GitHub e o site atualiza em poucos minutos.
+   ========================================================== */
+const LOJA = {
+  lema: "Peças 3D.",
+
+  // Links dos botões. Deixe "" para o botão não aparecer.
+  shopee: "",     // ex.: "https://shopee.com.br/lumity"
+  whatsapp: "",   // só números com DDD, ex.: "5511999999999"
+
+  sobre: [
+    "A Lumity é uma loja de peças feitas em impressão 3D.",
+    "O nome nasceu de duas ideias: luz e algo raro.",
+  ],
+
+  /* Para adicionar um produto, copie um bloco { ... }, e separe com vírgula.
+     Exemplo (apague as barras // para ativar):
+     { nome: "Luminária lua", preco: "R$ 59,90", descricao: "Impressa em 3D.", foto: "fotos/lua.jpg", link: "https://shopee.com.br/..." },
+  */
+  produtos: [
+  ],
+
+  /* Avaliações. Exemplo:
+     { nome: "Ana", nota: 5, texto: "Chegou rápido e é lindo." },
+  */
+  avaliacoes: [
+  ],
+};
+
+/* ==========================================================
+   Daqui para baixo não precisa mexer.
+   ========================================================== */
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, cls, texto) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (texto !== undefined) e.textContent = texto;
+    return e;
+  };
+  const botao = (texto, href, principal) => {
+    const a = el("a", "botao" + (principal ? " principal" : ""), texto);
+    a.href = href;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    return a;
+  };
+  const zap = () => LOJA.whatsapp ? "https://wa.me/" + LOJA.whatsapp.replace(/\D/g, "") : "";
+
+  function contatos(raiz) {
+    if (!LOJA.shopee && !zap()) return;
+    const acoes = el("div", "acoes");
+    if (LOJA.shopee) acoes.append(botao("Ver loja na Shopee", LOJA.shopee, true));
+    if (zap()) acoes.append(botao("Falar pelo WhatsApp", zap(), !LOJA.shopee));
+    raiz.append(acoes);
+  }
+
+  $("lema").textContent = LOJA.lema;
+  document.title = "Lumity" + (LOJA.lema ? " · " + LOJA.lema.replace(/\.$/, "") : "");
+
+  // Produtos
+  const pr = $("produtos-conteudo");
+  if (!LOJA.produtos.length) {
+    const v = el("div", "vazio");
+    v.append(el("p", "", "Os primeiros produtos ainda estão sendo preparados."));
+    contatos(v);
+    pr.append(v);
+  } else {
+    const g = el("div", "grade");
+    LOJA.produtos.forEach((p) => {
+      const c = el("article", "produto");
+      if (p.foto) { const i = el("img", "foto"); i.src = p.foto; i.alt = p.nome || ""; i.loading = "lazy"; c.append(i); }
+      else c.append(el("div", "foto"));
+      const info = el("div", "info");
+      info.append(el("h3", "", p.nome || ""));
+      if (p.preco) info.append(el("span", "preco", p.preco));
+      if (p.descricao) info.append(el("p", "desc", p.descricao));
+      if (p.link) info.append(botao("Comprar", p.link, true));
+      c.append(info);
+      g.append(c);
+    });
+    pr.append(g);
+  }
+
+  // Sobre
+  const so = $("sobre-conteudo");
+  const t = el("div", "texto");
+  LOJA.sobre.forEach((par) => t.append(el("p", "", par)));
+  so.append(t);
+  contatos(so);
+
+  // Avaliações
+  const av = $("avaliacoes-conteudo");
+  if (!LOJA.avaliacoes.length) {
+    const v = el("div", "vazio");
+    v.append(el("p", "", "Ainda não há avaliações. As primeiras vão aparecer aqui depois das primeiras vendas."));
+    av.append(v);
+  } else {
+    const l = el("div", "lista");
+    LOJA.avaliacoes.forEach((a) => {
+      const c = el("article", "avaliacao");
+      const n = Math.max(0, Math.min(5, Number(a.nota) || 0));
+      const estrelas = el("div", "nota", "★".repeat(n) + "☆".repeat(5 - n));
+      estrelas.setAttribute("aria-label", n + " de 5");
+      c.append(estrelas);
+      const b = el("blockquote", "", a.texto || "");
+      c.append(b, el("div", "autor", a.nome || ""));
+      l.append(c);
+    });
+    av.append(l);
+  }
+
+  // Navegação pela barra da direita
+  const painéis = ["produtos", "sobre", "avaliacoes"];
+  const links = document.querySelectorAll(".rail a");
+  function mostrar() {
+    const alvo = painéis.includes(location.hash.slice(1)) ? location.hash.slice(1) : "produtos";
+    painéis.forEach((id) => { $(id).hidden = id !== alvo; });
+    links.forEach((a) => {
+      if (a.dataset.painel === alvo) a.setAttribute("aria-current", "page");
+      else a.removeAttribute("aria-current");
+    });
+  }
+  window.addEventListener("hashchange", mostrar);
+  mostrar();
+
+  // Luz que acompanha o cursor (só quando a pessoa mexe o mouse)
+  const central = $("central");
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    central.addEventListener("pointermove", (e) => {
+      const r = central.getBoundingClientRect();
+      central.style.setProperty("--x", (e.clientX - r.left) + "px");
+      central.style.setProperty("--y", (e.clientY - r.top) + "px");
+    });
+  }
+})();
+</script>
+</body>
+</html>
